@@ -119,7 +119,12 @@ public class MainUIController extends BaseFXController {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ImageView dbImage = new ImageView("icons/computer.png");
+        try {
+            ConfigHelper.createEmptyFiles();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ImageView dbImage = new ImageView(this.getClass().getResource("/icons/computer.png").toExternalForm());
         dbImage.setFitHeight(40);
         dbImage.setFitWidth(40);
         connectionLabel.setGraphic(dbImage);
@@ -128,7 +133,7 @@ public class MainUIController extends BaseFXController {
             controller.setMainUIController(this);
             controller.showDialogStage();
         });
-        ImageView configImage = new ImageView("icons/config-list.png");
+        ImageView configImage = new ImageView(this.getClass().getResource("/icons/config-list.png").toExternalForm());
         configImage.setFitHeight(40);
         configImage.setFitWidth(40);
         configsLabel.setGraphic(configImage);
@@ -232,7 +237,7 @@ public class MainUIController extends BaseFXController {
                 children.clear();
                 for (String tableName : tables) {
                     TreeItem<String> newTreeItem = new TreeItem<>();
-                    ImageView imageView = new ImageView("icons/table.png");
+                    ImageView imageView = new ImageView(this.getClass().getResource("/icons/table.png").toExternalForm());
                     imageView.setFitHeight(16);
                     imageView.setFitWidth(16);
                     newTreeItem.setGraphic(imageView);
@@ -243,13 +248,13 @@ public class MainUIController extends BaseFXController {
                 treeItem.getChildren().clear();
             }
             if (StringUtils.isNotBlank(filter)) {
-                ImageView imageView = new ImageView("icons/filter.png");
+                ImageView imageView = new ImageView(this.getClass().getResource("/icons/filter.png").toExternalForm());
                 imageView.setFitHeight(16);
                 imageView.setFitWidth(16);
                 imageView.setUserData(treeItem.getGraphic().getUserData());
                 treeItem.setGraphic(imageView);
             }else {
-                ImageView dbImage = new ImageView("icons/computer.png");
+                ImageView dbImage = new ImageView(this.getClass().getResource("/icons/computer.png").toExternalForm());
                 dbImage.setFitHeight(16);
                 dbImage.setFitWidth(16);
                 dbImage.setUserData(treeItem.getGraphic().getUserData());
@@ -285,7 +290,7 @@ public class MainUIController extends BaseFXController {
             for (DatabaseConfig dbConfig : dbConfigs) {
                 TreeItem<String> treeItem = new TreeItem<>();
                 treeItem.setValue(dbConfig.getName());
-                ImageView dbImage = new ImageView("icons/computer.png");
+                ImageView dbImage = new ImageView(this.getClass().getResource("/icons/computer.png").toExternalForm());
                 dbImage.setFitHeight(16);
                 dbImage.setFitWidth(16);
                 dbImage.setUserData(dbConfig);

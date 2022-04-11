@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<ToolFxmlLoaderConfiguration title="developTools" menuId="p-developTools" menuParentId="moreToolsMenu" isMenu="true" />
+	<ToolFxmlLoaderConfiguration>
+		<url>/fxml/MainUI.fxml</url>
+		<resourceBundleName>locale.MybatisGeneratorTool</resourceBundleName>
+		<className></className>
+		<title>Title</title>
+		<iconPath>/icons/mybatis-logo.png</iconPath>
+		<isDefaultShow></isDefaultShow>
+		<menuId></menuId>
+		<menuParentId>p-developTools</menuParentId>
+		<controllerType>Node</controllerType>
+	</ToolFxmlLoaderConfiguration>
+</root>

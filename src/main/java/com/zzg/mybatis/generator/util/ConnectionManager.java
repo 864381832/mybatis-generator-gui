@@ -12,7 +12,7 @@ import java.sql.DriverManager;
  */
 public class ConnectionManager {
     private static final Logger _LOG = LoggerFactory.getLogger(ConnectionManager.class);
-    private static final String DB_URL = "jdbc:sqlite:./config/sqlite3.db";
+    private static final String DB_URL = "jdbc:sqlite:./config/mybatis-generator-gui-sqlite3.db";
 
     public static Connection getConnection() throws Exception {
         Class.forName("org.sqlite.JDBC");

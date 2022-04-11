@@ -29,8 +29,9 @@ public abstract class BaseFXController implements Initializable {
         if (cache && parentNodeRef != null) {
             return parentNodeRef.get();
         }
-        URL skeletonResource = Thread.currentThread().getContextClassLoader().getResource(fxmlPage.getFxml());
+        URL skeletonResource = BaseFXController.class.getResource(fxmlPage.getFxml());
         FXMLLoader loader = new FXMLLoader(skeletonResource);
+        loader.setClassLoader(BaseFXController.class.getClassLoader());
         Parent loginNode;
         try {
             loginNode = loader.load();
@@ -39,7 +40,7 @@ public abstract class BaseFXController implements Initializable {
             Stage            tmpDialogStage = new Stage();
             tmpDialogStage.setTitle(title);
             tmpDialogStage.initModality(Modality.APPLICATION_MODAL);
-            tmpDialogStage.initOwner(getPrimaryStage());
+//            tmpDialogStage.initOwner(getPrimaryStage());
             tmpDialogStage.setScene(new Scene(loginNode));
             tmpDialogStage.setMaximized(false);
             tmpDialogStage.setResizable(false);

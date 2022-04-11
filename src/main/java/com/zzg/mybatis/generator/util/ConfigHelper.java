@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zzg.mybatis.generator.model.DatabaseConfig;
 import com.zzg.mybatis.generator.model.DbType;
 import com.zzg.mybatis.generator.model.GeneratorConfig;
+import org.apache.commons.io.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +12,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * XML based config file help class
@@ -29,7 +32,7 @@ public class ConfigHelper {
 
 	private static final Logger _LOG = LoggerFactory.getLogger(ConfigHelper.class);
 	private static final String BASE_DIR = "config";
-	private static final String CONFIG_FILE = "/sqlite3.db";
+	private static final String CONFIG_FILE = "/mybatis-generator-gui-sqlite3.db";
 
 	public static void createEmptyFiles() throws Exception {
 		File file = new File(BASE_DIR);
@@ -46,7 +49,7 @@ public class ConfigHelper {
 		InputStream fis = null;
 		FileOutputStream fos = null;
 		try {
-			fis = Thread.currentThread().getContextClassLoader().getResourceAsStream("sqlite3.db");
+			fis = ConfigHelper.class.getResourceAsStream("/sqlite3.db");
 			fos = new FileOutputStream(uiConfigFile);
 			byte[] buffer = new byte[1024];
 			int byteread = 0;
@@ -57,7 +60,6 @@ public class ConfigHelper {
 			if (fis != null) fis.close();
 			if (fos != null) fos.close();
 		}
-
 	}
 
 	public static List<DatabaseConfig> loadDatabaseConfig() throws Exception {
@@ -211,30 +213,62 @@ public class ConfigHelper {
 
 	public static String findConnectorLibPath(String dbType) {
 		DbType type = DbType.valueOf(dbType);
-		URL resource = Thread.currentThread().getContextClassLoader().getResource("logback.xml");
-		_LOG.info("jar resource: {}", resource);
-		if (resource != null) {
-			try {
-				File file = new File(resource.toURI().getRawPath() + "/../lib/" + type.getConnectorJarFile());
-				return URLDecoder.decode(file.getCanonicalPath(), Charset.forName("UTF-8").displayName());
-			} catch (Exception e) {
-				throw new RuntimeException("找不到驱动文件，请联系开发者");
+//		URL resource = Thread.currentThread().getContextClassLoader().getResource("logback.xml");
+//		_LOG.info("jar resource: {}", resource);
+//		if (resource != null) {
+//			try {
+//				File file = new File(resource.toURI().getRawPath() + "/../lib/" + type.getConnectorJarFile());
+//				return URLDecoder.decode(file.getCanonicalPath(), Charset.forName("UTF-8").displayName());
+//			} catch (Exception e) {
+//				throw new RuntimeException("找不到驱动文件，请联系开发者");
+//			}
+//		} else {
+//			throw new RuntimeException("lib can't find");
+//		}
+		try {
+			File file;
+			File myRunJarFile = new File(ConfigHelper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			if (myRunJarFile.isFile()) {
+				file = new File("lib/" + type.getConnectorJarFile());
+			} else {
+				file = new File("src/main/resources/lib/" + type.getConnectorJarFile());
 			}
-		} else {
-			throw new RuntimeException("lib can't find");
+			return URLDecoder.decode(file.getCanonicalPath(), Charset.forName("UTF-8").displayName());
+		} catch (Exception e) {
+			throw new RuntimeException("找不到驱动文件，请联系开发者");
 		}
 	}
 
 	public static List<String> getAllJDBCDriverJarPaths() {
 		List<String> jarFilePathList = new ArrayList<>();
-		URL url = Thread.currentThread().getContextClassLoader().getResource("logback.xml");
+//		URL url = Thread.currentThread().getContextClassLoader().getResource("logback.xml");
 		try {
 			File file;
-			if (url.getPath().contains(".jar")) {
+			File myRunJarFile = new File(ConfigHelper.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+			if(myRunJarFile.isFile()) {
 				file = new File("lib/");
-			} else {
+				if(!file.exists()){file.mkdirs();}
+				JarFile jarFile1 = new JarFile(myRunJarFile);
+				Enumeration<JarEntry> enum1 = jarFile1.entries();
+				while (enum1.hasMoreElements()) {
+					JarEntry jarEntry = enum1.nextElement();
+					if (jarEntry.getName().endsWith(".jar")) {
+						File jarFile = new File(jarEntry.getName());
+						if(!jarFile.exists()) {
+							InputStream input = jarFile1.getInputStream(jarEntry);
+							IOUtil.copy(input, new FileOutputStream(jarFile));
+						}
+					}
+				}
+			}else {
 				file = new File("src/main/resources/lib");
 			}
+//			if (url.getPath().contains(".jar")) {
+//				file = new File("lib/");
+//			} else {
+//				file = new File("src/main/resources/lib");
+//			}
+
 			_LOG.info("jar lib path: {}", file.getCanonicalPath());
 			File[] jarFiles = file.listFiles();
 			if (jarFiles != null && jarFiles.length > 0) {
